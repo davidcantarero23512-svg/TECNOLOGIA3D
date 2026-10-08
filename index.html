@@ -1,0 +1,231 @@
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Congreso de Ingeniería de Grandes Puentes</title>
+<style>
+:root{--bg:#07111f;--panel:#0d1b2e;--panel2:#10243c;--text:#f5f8ff;--muted:#a9bad0;--accent:#22d3ee;--red:#ff3b30;--blue:#2f80ff;--gold:#ffb703}
+*{box-sizing:border-box} body{margin:0;background:#020812;color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;overflow:hidden}
+.deck{width:100vw;height:100vh;position:relative}.slide{position:absolute;inset:0;padding:52px 66px 72px;display:none;overflow:auto;background:
+radial-gradient(circle at 85% 15%,rgba(34,211,238,.12),transparent 30%),linear-gradient(135deg,#06101e,#0a1728 55%,#07111f)}
+.slide.active{display:block;animation:in .35s ease}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.kicker{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:800}.num{font-weight:800;color:#71839b}
+h1{font-size:clamp(40px,6vw,78px);line-height:.98;margin:0 0 18px;max-width:1000px}h2{font-size:42px;margin:0 0 22px}h3{margin:0 0 8px}p{color:var(--muted);line-height:1.55;font-size:17px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:rgba(13,27,46,.86);border:1px solid #1b3654;border-radius:20px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.22)}.hero{min-height:calc(100vh - 120px);display:flex;flex-direction:column;justify-content:center}.names{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}.pill{border:1px solid #294762;border-radius:999px;padding:9px 14px;color:#dce9f7;background:#0b1b2d}
+.stat{font-size:29px;font-weight:900}.label{font-size:12px;text-transform:uppercase;letter-spacing:1.3px;color:#8195ad;margin-top:4px}.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.fact{padding:14px;background:#0a1728;border-radius:14px;border:1px solid #19324d}.fact b{display:block;color:#fff;margin-bottom:5px}
+.photo{position:relative;min-height:420px;border-radius:22px;overflow:hidden;border:1px solid #294762;background:#081522}.photo img{width:100%;height:100%;min-height:420px;object-fit:cover;display:block}.caption{position:absolute;left:14px;bottom:14px;background:rgba(0,0,0,.65);padding:8px 12px;border-radius:10px;font-size:12px;color:#dfeaf7}
+.map{position:relative;border-radius:22px;overflow:hidden;min-height:470px;border:1px solid #294762;background:#071522}.map img{width:100%;height:100%;min-height:470px;object-fit:cover;filter:saturate(.9) contrast(1.05)}.map:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(2,8,18,.35))}
+.overlay{position:absolute;inset:0;z-index:2}.arrow{position:absolute;height:4px;border-radius:10px;transform-origin:left center}.arrow.red{background:var(--red);box-shadow:0 0 10px rgba(255,59,48,.65)}.arrow.blue{background:var(--blue);box-shadow:0 0 10px rgba(47,128,255,.65)}.arrow:after{content:"";position:absolute;right:-1px;top:50%;transform:translateY(-50%);border-left:12px solid currentColor;border-top:7px solid transparent;border-bottom:7px solid transparent}.red{color:var(--red)}.blue{color:var(--blue)}
+.legend{position:absolute;z-index:4;top:15px;left:15px;background:rgba(3,10,19,.86);padding:12px 15px;border-radius:13px;font-size:13px;line-height:1.8;border:1px solid #31506d}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}.redbg{background:var(--red)}.bluebg{background:var(--blue)}
+.tag{position:absolute;z-index:4;right:15px;top:15px;background:rgba(3,10,19,.82);border:1px solid #31506d;padding:9px 12px;border-radius:10px;font-size:12px;color:#c9d9e8}
+table{width:100%;border-collapse:collapse;font-size:15px}th,td{padding:14px;border-bottom:1px solid #213b55;text-align:left}th{color:#8ea5bd;font-size:12px;text-transform:uppercase;letter-spacing:1px}td strong{color:#fff}
+.rule{display:flex;gap:16px;align-items:flex-start}.ruleNo{font-size:34px;font-weight:900;color:var(--accent);line-height:1}.rule p{margin:0}.source{font-size:11px;color:#70869d;margin-top:10px}.source a{color:#7fd9ff}
+.controls{position:fixed;z-index:20;right:22px;bottom:18px;display:flex;gap:8px}.btn{width:43px;height:43px;border:1px solid #2a4660;background:#0b1a2c;color:white;border-radius:12px;cursor:pointer;font-size:18px}.btn:hover{background:#12304b}.progress{position:fixed;z-index:20;left:0;bottom:0;height:4px;background:var(--accent);transition:.3s}.hint{position:fixed;z-index:20;left:22px;bottom:22px;color:#647a91;font-size:12px}
+.badge{display:inline-block;padding:7px 10px;border-radius:9px;background:#102943;color:#bfeeff;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.8px}
+.small{font-size:14px}.center{text-align:center}.bigquote{font-size:28px;line-height:1.3;font-weight:800;color:#eaf5ff}
+@keyframes in{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@media(max-width:850px){.slide{padding:30px 24px 75px}.grid2,.grid3{grid-template-columns:1fr}.facts{grid-template-columns:1fr}.photo,.map,.photo img,.map img{min-height:300px}h2{font-size:31px}p{font-size:15px}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<section class="slide active">
+<div class="hero">
+<div class="kicker">Tecnología y Digitalización · 3º ESO</div>
+<h1>Congreso de Ingeniería<br>de Grandes Puentes</h1>
+<p class="bigquote">Análisis estructural de dos puentes internacionales y transferencia de sus soluciones al puente de palillos.</p>
+<div class="names">
+<span class="pill">David Cantarero Martinez</span><span class="pill">David Rubio Gallego</span><span class="pill">Iker socuellamos Sanchez</span>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><span class="badge">8–10 min</span><span class="badge">Tracción · Compresión · Pandeo</span><span class="badge">3º ESO</span></div>
+</div>
+</section>
+
+<section class="slide">
+<div class="top"><div class="kicker">Puente 1 · Ficha técnica</div><div class="num">02 / 08</div></div>
+<h2>Golden Gate Bridge</h2>
+<div class="grid2">
+<div>
+<div class="facts">
+<div class="fact"><b>Localización</b>San Francisco, California, EE. UU.</div>
+<div class="fact"><b>Inauguración</b>1937</div>
+<div class="fact"><b>Tipología</b>Puente colgante</div>
+<div class="fact"><b>Luz principal</b>1.280 m aprox.</div>
+<div class="fact"><b>Longitud total</b>2.737 m aprox.</div>
+<div class="fact"><b>Material principal</b>Acero + hormigón en cimentaciones</div>
+<div class="fact"><b>Función</b>Tráfico rodado y peatones</div>
+<div class="fact"><b>Ingeniería</b>Joseph B. Strauss, con Charles A. Ellis y otros especialistas</div>
+</div>
+<p><b>Contexto:</b> cruza el estrecho Golden Gate y conecta San Francisco con Marin County. Su sistema de suspensión permite salvar una gran luz mediante cables principales, péndolas y torres.</p>
+</div>
+<div class="photo">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Aerial_view_of_Golden_Gate_Bridge_from_southwest_dllu.jpg/1920px-Aerial_view_of_Golden_Gate_Bridge_from_southwest_dllu.jpg" alt="Golden Gate Bridge, vista aérea">
+<div class="caption">Vista aérea de referencia · Wikimedia Commons · CC BY-SA 4.0</div>
+</div>
+</div>
+<div class="source">Datos técnicos contrastados con Golden Gate Bridge, Highway and Transportation District. La actividad pide explorar el puente en Google Earth 3D; esta vista aérea está integrada como referencia visual.</div>
+</section>
+
+<section class="slide">
+<div class="top"><div class="kicker">Puente 1 · Mapa de esfuerzos</div><div class="num">03 / 08</div></div>
+<h2>Golden Gate · ¿Cómo trabaja?</h2>
+<div class="grid2">
+<div class="map">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Aerial_view_of_Golden_Gate_Bridge_from_southwest_dllu.jpg/1600px-Aerial_view_of_Golden_Gate_Bridge_from_southwest_dllu.jpg" alt="Golden Gate">
+<div class="legend"><span class="dot redbg"></span><b>ROJO:</b> compresión<br><span class="dot bluebg"></span><b>AZUL:</b> tracción</div>
+<div class="tag">MAPA DE ESFUERZOS · VISTA 3D AÉREA</div>
+<div class="overlay">
+<div class="arrow blue" style="left:22%;top:36%;width:56%;transform:rotate(4deg)"></div>
+<div class="arrow blue" style="left:30%;top:48%;width:38%;transform:rotate(-8deg)"></div>
+<div class="arrow red" style="left:37%;top:31%;width:2px;height:45%;transform:rotate(0deg)"></div>
+<div class="arrow red" style="left:61%;top:30%;width:2px;height:45%;transform:rotate(0deg)"></div>
+</div>
+</div>
+<div>
+<div class="card"><h3>Tracción · azul</h3><p>Los <b>cables principales</b> trabajan principalmente a tracción. Las péndolas transmiten la carga del tablero hacia esos cables.</p></div>
+<div class="card" style="margin-top:14px"><h3>Compresión · rojo</h3><p>Las <b>torres</b> reciben y transmiten grandes cargas hacia las cimentaciones. El tablero dispone de una celosía que aporta rigidez.</p></div>
+<div class="card" style="margin-top:14px"><h3>Estabilidad</h3><p>La triangulación y el arriostramiento del tablero reducen deformaciones. La geometría de las piezas comprimidas ayuda a limitar el <b>pandeo</b>.</p></div>
+</div>
+</div>
+<div class="source">Convención de colores tomada literalmente de la actividad: rojo = compresión; azul = tracción. fileciteturn0file0L57-L69</div>
+</section>
+
+<section class="slide">
+<div class="top"><div class="kicker">Puente 2 · Ficha técnica</div><div class="num">04 / 08</div></div>
+<h2>Forth Bridge</h2>
+<div class="grid2">
+<div>
+<div class="facts">
+<div class="fact"><b>Localización</b>Estuario del Forth, Escocia, Reino Unido</div>
+<div class="fact"><b>Inauguración</b>1890</div>
+<div class="fact"><b>Tipología</b>Puente ferroviario de ménsula / cantilever con celosía</div>
+<div class="fact"><b>Luz de los tramos principales</b>≈ 521 m</div>
+<div class="fact"><b>Longitud total</b>≈ 2.529 m</div>
+<div class="fact"><b>Material principal</b>Acero y cimentaciones de piedra/hormigón</div>
+<div class="fact"><b>Función</b>Tráfico ferroviario de pasajeros y mercancías</div>
+<div class="fact"><b>Ingenieros</b>Sir John Fowler y Sir Benjamin Baker</div>
+</div>
+<p><b>Contexto:</b> se diseñó para resolver el cruce ferroviario del estuario del Forth. Sus tres grandes torres y brazos en ménsula forman una estructura triangulada muy visible.</p>
+</div>
+<div class="photo">
+<img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Scotland-2016-Aerial-Edinburgh-Forth_Bridge.jpg" alt="Forth Bridge, vista aérea">
+<div class="caption">Vista aérea · Andrew Shiva · Wikimedia Commons · CC BY-SA 4.0</div>
+</div>
+</div>
+<div class="source">UNESCO indica 2.529 m de longitud, apertura en 1890 y uso ferroviario; Historic Environment Scotland identifica a Fowler y Baker como diseñadores. citeturn0search0turn0search4</div>
+</section>
+
+<section class="slide">
+<div class="top"><div class="kicker">Puente 2 · Mapa de esfuerzos</div><div class="num">05 / 08</div></div>
+<h2>Forth Bridge · ¿Cómo trabaja?</h2>
+<div class="grid2">
+<div class="map">
+<img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Scotland-2016-Aerial-Edinburgh-Forth_Bridge.jpg" alt="Forth Bridge">
+<div class="legend"><span class="dot redbg"></span><b>ROJO:</b> compresión<br><span class="dot bluebg"></span><b>AZUL:</b> tracción</div>
+<div class="tag">MAPA DE ESFUERZOS · VISTA 3D AÉREA</div>
+<div class="overlay">
+<div class="arrow red" style="left:18%;top:52%;width:66%;transform:rotate(0deg)"></div>
+<div class="arrow red" style="left:30%;top:23%;width:2px;height:57%"></div>
+<div class="arrow red" style="left:50%;top:20%;width:2px;height:62%"></div>
+<div class="arrow red" style="left:70%;top:23%;width:2px;height:57%"></div>
+<div class="arrow blue" style="left:28%;top:37%;width:19%;transform:rotate(25deg)"></div>
+<div class="arrow blue" style="left:53%;top:37%;width:18%;transform:rotate(-25deg)"></div>
+</div>
+</div>
+<div>
+<div class="card"><h3>Compresión · rojo</h3><p>Los grandes elementos tubulares y partes de las torres reciben <b>compresión</b>. Las cargas bajan hasta las pilas y cimentaciones.</p></div>
+<div class="card" style="margin-top:14px"><h3>Tracción · azul</h3><p>En la estructura triangulada existen barras que trabajan a <b>tracción</b>, equilibrando los esfuerzos de las barras comprimidas.</p></div>
+<div class="card" style="margin-top:14px"><h3>Nudos y cartelas</h3><p>Las uniones remachadas y las <b>cartelas</b> conectan barras. La celosía crea triángulos que aumentan la rigidez y controlan deformaciones.</p></div>
+</div>
+</div>
+<div class="source">UNESCO describe tubos de acero usados a compresión y otros elementos más ligeros trabajando a tracción, además de torres de doble ménsula y tramos suspendidos. citeturn0search0</div>
+</section>
+
+<section class="slide">
+<div class="top"><div class="kicker">Comparación estructural</div><div class="num">06 / 08</div></div>
+<h2>Dos soluciones para salvar grandes luces</h2>
+<div class="card">
+<table>
+<thead><tr><th>Aspecto</th><th>Golden Gate</th><th>Forth Bridge</th></tr></thead>
+<tbody>
+<tr><td><strong>Tipología</strong></td><td>Colgante</td><td>Ménsula / cantilever con celosía</td></tr>
+<tr><td><strong>Luz máxima</strong></td><td>≈ 1.280 m</td><td>≈ 521 m</td></tr>
+<tr><td><strong>Longitud total</strong></td><td>≈ 2.737 m</td><td>≈ 2.529 m</td></tr>
+<tr><td><strong>Material dominante</strong></td><td>Acero</td><td>Acero</td></tr>
+<tr><td><strong>Función</strong></td><td>Carretera + peatones</td><td>Ferrocarril</td></tr>
+<tr><td><strong>Rigidez</strong></td><td>El tablero se rigidiza y se sostiene mediante cables y péndolas</td><td>La gran celosía triangulada aporta mucha rigidez</td></tr>
+<tr><td><strong>Idea clave</strong></td><td>Los cables permiten salvar una luz enorme trabajando a tracción</td><td>La triangulación distribuye tracción y compresión por muchas barras</td></tr>
+</tbody>
+</table>
+</div>
+<div class="grid2" style="margin-top:18px">
+<div class="card"><h3>¿Qué tienen en común?</h3><p>Ambos llevan las cargas desde el tablero hacia apoyos resistentes y utilizan acero, geometría estructural y uniones para controlar las deformaciones.</p></div>
+<div class="card"><h3>¿Qué cambia?</h3><p>El Golden Gate depende del sistema de suspensión; el Forth Bridge hace visible una gran <b>cercha tridimensional</b> basada en ménsulas equilibradas.</p></div>
+</div>
+</section>
+
+<section class="slide">
+<div class="top"><div class="kicker">Pandeo y uniones</div><div class="num">07 / 08</div></div>
+<h2>¿Cómo evitan fallos en los puntos débiles?</h2>
+<div class="grid3">
+<div class="card"><span class="badge">01 · Pandeo</span><h3 style="margin-top:14px">Acortar piezas comprimidas</h3><p>La triangulación divide la estructura en elementos más cortos. Una pieza comprimida más corta es menos vulnerable al <b>pandeo</b>.</p></div>
+<div class="card"><span class="badge">02 · Nudos</span><h3 style="margin-top:14px">Cartelas y uniones</h3><p>Las <b>cartelas</b>, remaches y solapes permiten transmitir las fuerzas entre barras sin concentrarlas en un único punto.</p></div>
+<div class="card"><span class="badge">03 · Rigidez</span><h3 style="margin-top:14px">Triangulación</h3><p>Los triángulos mantienen la geometría y reducen movimientos. La estructura trabaja como un conjunto y no como barras aisladas.</p></div>
+</div>
+<div class="card" style="margin-top:20px">
+<h3>Aplicación directa al puente de palillos</h3>
+<p>La idea fundamental es que cada barra debe tener una función clara: algunas trabajan a <b>tracción</b>, otras a <b>compresión</b>. Los nudos deben estar bien solapados y reforzados, evitando barras largas y delgadas comprimidas.</p>
+</div>
+<div class="source">El enunciado exige explicar cartelas de refuerzo, geometría de nudos triangulados y el mecanismo para evitar el pandeo. fileciteturn0file0L57-L69</div>
+</section>
+
+<section class="slide">
+<div class="top"><div class="kicker">Transferencia al taller</div><div class="num">08 / 08</div></div>
+<h2>Las 3 reglas de oro para nuestro puente</h2>
+<div class="grid2">
+<div class="card rule"><div class="ruleNo">01</div><div><h3>TRIANGULAR</h3><p>Crear una <b>cercha</b> con triángulos para conseguir rigidez y repartir las cargas.</p></div></div>
+<div class="card rule"><div class="ruleNo">02</div><div><h3>REFORZAR LOS NUDOS</h3><p>Usar <b>solapes y cartelas</b> para que las uniones no sean el punto débil.</p></div></div>
+<div class="card rule"><div class="ruleNo">03</div><div><h3>CONTROLAR EL PANDEO</h3><p>Evitar barras largas y delgadas trabajando a <b>compresión</b>; añadir diagonales y apoyos cuando sea necesario.</p></div></div>
+<div class="card">
+<h3>Conclusión</h3>
+<p>Los dos puentes demuestran que la resistencia no depende solo de usar más material. La clave es diseñar bien la geometría, repartir los esfuerzos y construir uniones capaces de transmitirlos.</p>
+</div>
+</div>
+<div class="card center" style="margin-top:22px">
+<p style="margin:0;color:#d9e8f7"><b>Vocabulario que debemos utilizar:</b> luz · cercha · cordón superior/inferior · pandeo · cizalladura · solape · tracción · compresión · cartela</p>
+</div>
+<div class="source">Las tres reglas se han formulado para transferir las conclusiones del análisis a la estructura triangulada de palillos indicada en la actividad. fileciteturn0file0L72-L76</div>
+</section>
+
+<div class="controls">
+<button class="btn" onclick="go(0)" title="Inicio">⌂</button>
+<button class="btn" onclick="prev()" title="Anterior">‹</button>
+<button class="btn" onclick="next()" title="Siguiente">›</button>
+</div>
+<div class="hint">← → para navegar · Inicio / Fin · Espacio</div>
+<div class="progress" id="progress"></div>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+function render(){slides.forEach((s,n)=>s.classList.toggle('active',n===i));document.getElementById('progress').style.width=((i+1)/slides.length*100)+'%';}
+function go(n){i=Math.max(0,Math.min(slides.length-1,n));render()}
+function next(){go(i+1)} function prev(){go(i-1)}
+document.addEventListener('keydown',e=>{
+ if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();next()}
+ if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
+ if(e.key==='Home'){e.preventDefault();go(0)}
+ if(e.key==='End'){e.preventDefault();go(slides.length-1)}
+});
+render();
+</script>
+</body>
+</html>'''
+
+path = Path("/mnt/data/index.html")
+path.write_text(html, encoding="utf-8")
+print(f"Creado: {path}")
+print(f"Tamaño: {path.stat().st_size/1024:.1f} KB")
